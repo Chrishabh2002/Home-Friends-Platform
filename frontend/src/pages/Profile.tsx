@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import API_URL from "../config";
 import { useAuthStore } from "../store/authStore";
 import { Save, ArrowLeft, LogOut, Trash2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -30,24 +31,24 @@ export default function Profile() {
 
     const fetchProfile = async () => {
         try {
-            const res = await axios.get("http://localhost:8000/api/v1/auth/me");
+            const res = await axios.get(API_URL + "/api/v1/auth/me");
             setUser(res.data);
             setFullName(res.data.full_name);
             setSelectedAvatar(res.data.avatar_url || PRESET_AVATARS[0].url);
 
             // Fetch points
             try {
-                const groupRes = await axios.get("http://localhost:8000/api/v1/groups/my");
+                const groupRes = await axios.get(API_URL + "/api/v1/groups/my");
                 if (groupRes.data.length > 0) {
                     const groupId = groupRes.data[0].id;
-                    const membersRes = await axios.get(`http://localhost:8000/api/v1/groups/${groupId}/members`);
+                    const membersRes = await axios.get(`${API_URL}/api/v1/groups/${groupId}/members`);
                     const me = membersRes.data.find((m: any) => m.user_id === res.data.id);
                     if (me) {
                         setStats(s => ({ ...s, points: me.points }));
                     }
 
                     // Fetch completed tasks count
-                    const tasksRes = await axios.get("http://localhost:8000/api/v1/tasks/");
+                    const tasksRes = await axios.get(API_URL + "/api/v1/tasks/");
                     const completedCount = tasksRes.data.filter((t: any) => t.status === 'completed' && t.assigned_to_id === res.data.id).length;
                     setStats(s => ({ ...s, tasksCompleted: completedCount }));
                 }
@@ -61,7 +62,7 @@ export default function Profile() {
     const handleSaveProfile = async () => {
         try {
             // Update name (backend needs PUT /auth/me endpoint)
-            await axios.put("http://localhost:8000/api/v1/auth/me", {
+            await axios.put(API_URL + "/api/v1/auth/me", {
                 full_name: fullName
             });
 
@@ -75,7 +76,7 @@ export default function Profile() {
 
     const handleAvatarSelect = async (avatarUrl: string) => {
         try {
-            await axios.put("http://localhost:8000/api/v1/auth/me", {
+            await axios.put(API_URL + "/api/v1/auth/me", {
                 avatar_url: avatarUrl
             });
             setSelectedAvatar(avatarUrl);
@@ -90,7 +91,7 @@ export default function Profile() {
     const handleDeleteAccount = async () => {
         if (!window.confirm("Are you SURE you want to delete your account? This cannot be undone!")) return;
         try {
-            await axios.delete("http://localhost:8000/api/v1/auth/me");
+            await axios.delete(API_URL + "/api/v1/auth/me");
             toast.success("Account deleted");
             logout();
         } catch (e: any) {

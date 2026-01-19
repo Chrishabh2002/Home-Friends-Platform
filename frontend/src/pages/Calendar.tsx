@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import API_URL from '../config';
 import { ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast, Toaster } from 'sonner';
@@ -26,7 +27,7 @@ export default function Calendar() {
 
     const fetchTasks = async () => {
         try {
-            const res = await axios.get('http://localhost:8000/api/v1/tasks/');
+            const res = await axios.get(`${API_URL}/api/v1/tasks/`);
             setTasks(res.data);
         } catch (e) {
             console.error(e);
@@ -72,7 +73,7 @@ export default function Calendar() {
 
     const handleCompleteTask = async (taskId: string) => {
         try {
-            await axios.put(`http://localhost:8000/api/v1/tasks/${taskId}?status=completed`);
+            await axios.put(`${API_URL}/api/v1/tasks/${taskId}?status=completed`);
             toast.success('Task completed!');
             fetchTasks();
             if (selectedDate) {

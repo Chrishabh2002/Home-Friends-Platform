@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import API_URL from "../config";
 import { useAuthStore } from "../store/authStore";
 import { motion, AnimatePresence } from "framer-motion";
 import { Copy, LogOut, Trash2, DollarSign, CheckCircle, XCircle, Plus } from "lucide-react";
@@ -91,21 +92,21 @@ export default function Dashboard() {
 
     const fetchPendingApprovals = async () => {
         try {
-            const res = await axios.get("http://localhost:8000/api/v1/tasks/pending-approvals");
+            const res = await axios.get(API_URL + "/api/v1/tasks/pending-approvals");
             setPendingApprovals(res.data);
         } catch (e) { console.error(e); }
     };
 
     const fetchAchievements = async () => {
         try {
-            const res = await axios.get("http://localhost:8000/api/v1/achievements/");
+            const res = await axios.get(API_URL + "/api/v1/achievements/");
             setAchievements(res.data);
         } catch (e) { console.error(e); }
     };
 
     const checkNewAchievements = async () => {
         try {
-            const res = await axios.post("http://localhost:8000/api/v1/achievements/check");
+            const res = await axios.post(API_URL + "/api/v1/achievements/check");
             if (res.data.newly_earned && res.data.newly_earned.length > 0) {
                 res.data.newly_earned.forEach((ach: any) => {
                     toast.success(`🎉 Achievement Unlocked: ${ach.icon} ${ach.name}!`, { duration: 5000 });
@@ -120,7 +121,7 @@ export default function Dashboard() {
 
     const handleApproveTask = async (taskId: string, approved: boolean) => {
         try {
-            await axios.put(`http://localhost:8000/api/v1/tasks/${taskId}/approve?approved=${approved}`);
+            await axios.put(`${API_URL}/api/v1/tasks/${taskId}/approve?approved=${approved}`);
             toast.success(approved ? 'Task approved! ✅' : 'Task rejected ❌');
             showNotification(approved ? 'Task Approved' : 'Task Rejected', approved ? 'Points awarded!' : 'Task reset to pending');
             fetchPendingApprovals();
@@ -143,7 +144,7 @@ export default function Dashboard() {
             formData.append('file', file);
 
             try {
-                await axios.post(`http://localhost:8000/api/v1/tasks/${taskId}/proof`, formData, {
+                await axios.post(`${API_URL}/api/v1/tasks/${taskId}/proof`, formData, {
                     headers: { 'Content-Type': 'multipart/form-data' }
                 });
                 toast.success('📸 Proof uploaded! Awaiting approval');
@@ -161,7 +162,7 @@ export default function Dashboard() {
     const fetchPoints = async () => {
         if (!group) return;
         try {
-            const res = await axios.get(`http://localhost:8000/api/v1/groups/${group.id}/members`);
+            const res = await axios.get(`${API_URL}/api/v1/groups/${group.id}/members`);
             const me = res.data.find((m: any) => m.user_id === useAuthStore.getState().user?.id);
             if (me) setMyPoints(me.points || 0);
         } catch (e) { }
@@ -169,14 +170,14 @@ export default function Dashboard() {
 
     const fetchRewards = async () => {
         try {
-            const res = await axios.get("http://localhost:8000/api/v1/rewards/");
+            const res = await axios.get(API_URL + "/api/v1/rewards/");
             setRewards(res.data);
         } catch (e) { console.error(e); }
     }
 
     const createReward = async () => {
         try {
-            await axios.post("http://localhost:8000/api/v1/rewards/", { ...newReward });
+            await axios.post(API_URL + "/api/v1/rewards/", { ...newReward });
             setNewReward({ title: "", cost: 50 });
             fetchRewards();
             toast.success("Reward created!");
@@ -185,7 +186,7 @@ export default function Dashboard() {
 
     const claimReward = async (id: string) => {
         try {
-            await axios.post(`http://localhost:8000/api/v1/rewards/${id}/claim`);
+            await axios.post(`${API_URL}/api/v1/rewards/${id}/claim`);
             toast.success("Reward Claimed! Pending approval.");
             fetchPoints();
             fetchPendingRedemptions();
@@ -201,14 +202,14 @@ export default function Dashboard() {
 
     const fetchPendingRedemptions = async () => {
         try {
-            const res = await axios.get("http://localhost:8000/api/v1/rewards/redemptions/pending");
+            const res = await axios.get(API_URL + "/api/v1/rewards/redemptions/pending");
             setPendingRedemptions(res.data);
         } catch (e) { }
     }
 
     const handleApproval = async (id: string, status: 'approved' | 'rejected') => {
         try {
-            await axios.put(`http://localhost:8000/api/v1/rewards/redemptions/${id}?status=${status}`);
+            await axios.put(`${API_URL}/api/v1/rewards/redemptions/${id}?status=${status}`);
             fetchPendingRedemptions();
             toast.success(`Request ${status}!`);
             if (status === 'rejected') fetchPoints();
@@ -228,14 +229,14 @@ export default function Dashboard() {
     // Pantry Logic
     const fetchPantry = async () => {
         try {
-            const res = await axios.get("http://localhost:8000/api/v1/pantry/items");
+            const res = await axios.get(API_URL + "/api/v1/pantry/items");
             setPantryItems(res.data);
         } catch (e) { }
     }
 
     const fetchShoppingList = async () => {
         try {
-            const res = await axios.get("http://localhost:8000/api/v1/pantry/shopping-list");
+            const res = await axios.get(API_URL + "/api/v1/pantry/shopping-list");
             setShoppingList(res.data);
         } catch (e) { }
     }
@@ -243,7 +244,7 @@ export default function Dashboard() {
     const addToPantry = async () => {
         if (!newItemName) return;
         try {
-            await axios.post("http://localhost:8000/api/v1/pantry/items", { name: newItemName });
+            await axios.post(API_URL + "/api/v1/pantry/items", { name: newItemName });
             setNewItemName("");
             fetchPantry();
             toast.success("Added to Pantry");
@@ -253,7 +254,7 @@ export default function Dashboard() {
     const addToShopping = async () => {
         if (!newItemName) return;
         try {
-            await axios.post("http://localhost:8000/api/v1/pantry/shopping-list", { name: newItemName });
+            await axios.post(API_URL + "/api/v1/pantry/shopping-list", { name: newItemName });
             setNewItemName("");
             fetchShoppingList();
             toast.success("Added to Shopping List");
@@ -262,14 +263,14 @@ export default function Dashboard() {
 
     const toggleShopping = async (id: string) => {
         try {
-            await axios.put(`http://localhost:8000/api/v1/pantry/shopping-list/${id}/toggle`);
+            await axios.put(`${API_URL}/api/v1/pantry/shopping-list/${id}/toggle`);
             fetchShoppingList();
         } catch (e) { }
     }
 
     const moveToPantry = async (id: string) => {
         try {
-            await axios.post(`http://localhost:8000/api/v1/pantry/shopping-list/${id}/move-to-pantry`);
+            await axios.post(`${API_URL}/api/v1/pantry/shopping-list/${id}/move-to-pantry`);
             fetchShoppingList();
             toast.success("Moved to Pantry! 🏠");
         } catch (e) { }
@@ -278,7 +279,7 @@ export default function Dashboard() {
     const handleSmartCommand = async (text: string) => {
         if (!text) return;
         try {
-            const res = await axios.post("http://localhost:8000/api/v1/smart/process", { text });
+            const res = await axios.post(API_URL + "/api/v1/smart/process", { text });
             toast.success(res.data.message);
             if (res.data.type === 'task') fetchTasks();
             if (res.data.type === 'expense') fetchExpenses();
@@ -289,7 +290,7 @@ export default function Dashboard() {
     useEffect(() => {
         const checkGroup = async () => {
             try {
-                const res = await axios.get("http://localhost:8000/api/v1/groups/my");
+                const res = await axios.get(API_URL + "/api/v1/groups/my");
                 if (res.data.length === 0) {
                     window.location.href = "/setup";
                 } else {
@@ -304,7 +305,7 @@ export default function Dashboard() {
 
     const fetchTasks = async () => {
         try {
-            const res = await axios.get("http://localhost:8000/api/v1/tasks/");
+            const res = await axios.get(API_URL + "/api/v1/tasks/");
             setTasks(res.data);
         } catch (err) {
             console.error(err);
@@ -314,7 +315,7 @@ export default function Dashboard() {
     const createTask = async () => {
         if (!newTaskTitle) return;
         try {
-            await axios.post("http://localhost:8000/api/v1/tasks/", {
+            await axios.post(API_URL + "/api/v1/tasks/", {
                 title: newTaskTitle,
                 priority: "medium",
                 points: 10,
@@ -331,7 +332,7 @@ export default function Dashboard() {
 
     const updateStatus = async (id: string, status: string) => {
         try {
-            await axios.put(`http://localhost:8000/api/v1/tasks/${id}?status=${status}`);
+            await axios.put(`${API_URL}/api/v1/tasks/${id}?status=${status}`);
             fetchTasks();
             if (status === 'completed') {
                 fetchPoints();
@@ -349,7 +350,7 @@ export default function Dashboard() {
     const deleteTask = async (id: string) => {
         if (!window.confirm("Are you sure you want to delete this task?")) return;
         try {
-            await axios.delete(`http://localhost:8000/api/v1/tasks/${id}`);
+            await axios.delete(`${API_URL}/api/v1/tasks/${id}`);
             fetchTasks();
             toast("Task deleted");
         } catch (e) { console.error(e); }
@@ -357,7 +358,7 @@ export default function Dashboard() {
 
     const fetchExpenses = async () => {
         try {
-            const res = await axios.get("http://localhost:8000/api/v1/expenses/");
+            const res = await axios.get(API_URL + "/api/v1/expenses/");
             setExpenses(res.data);
         } catch (err) {
             console.error(err);
@@ -366,7 +367,7 @@ export default function Dashboard() {
 
     const handleCreateExpense = async () => {
         try {
-            await axios.post("http://localhost:8000/api/v1/expenses", {
+            await axios.post(API_URL + "/api/v1/expenses", {
                 description: newExpense.description,
                 amount: parseFloat(newExpense.amount),
                 category: newExpense.category,
@@ -385,7 +386,7 @@ export default function Dashboard() {
     // Smart Split Logic
     const fetchBalances = async () => {
         try {
-            const res = await axios.get("http://localhost:8000/api/v1/expenses/balances");
+            const res = await axios.get(API_URL + "/api/v1/expenses/balances");
             setBalances(res.data);
             setShowBalances(true);
         } catch (e) { console.error(e); }
@@ -394,7 +395,7 @@ export default function Dashboard() {
     const handleSettle = async () => {
         if (!window.confirm("This will delete all current expenses. Everyone settled up?")) return;
         try {
-            await axios.post("http://localhost:8000/api/v1/expenses/settle");
+            await axios.post(API_URL + "/api/v1/expenses/settle");
             fetchBalances(); // close or refresh
             fetchExpenses();
             setShowBalances(false);
@@ -405,7 +406,7 @@ export default function Dashboard() {
     const fetchLeaderboard = async () => {
         if (!group) return;
         try {
-            const res = await axios.get(`http://localhost:8000/api/v1/groups/${group.id}/leaderboard`);
+            const res = await axios.get(`${API_URL}/api/v1/groups/${group.id}/leaderboard`);
             setLeaderboard(res.data);
         } catch (e) { console.error(e); }
     }

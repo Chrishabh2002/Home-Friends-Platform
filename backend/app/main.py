@@ -19,6 +19,8 @@ origins = [
     "http://localhost:5174",
     "http://127.0.0.1:5174",
     "http://localhost:3000",
+    "https://home-friends-platform.vercel.app",
+    "https://home-friends-platform.onrender.com",
 ]
 
 app.add_middleware(

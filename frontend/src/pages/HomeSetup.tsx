@@ -1,5 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
+import API_URL from "../config";
 import { useAuthStore } from "../store/authStore";
 import { motion } from "framer-motion";
 
@@ -12,7 +13,7 @@ export default function HomeSetup() {
 
     const handleCreate = async () => {
         try {
-            await axios.post("http://localhost:8000/api/v1/groups/", { name: groupName });
+            await axios.post(`${API_URL}/api/v1/groups/`, { name: groupName });
             window.location.href = "/dashboard"; // Redirect to dashboard
         } catch (err: any) {
             setError(err.response?.data?.detail || "Error creating group");
@@ -21,7 +22,7 @@ export default function HomeSetup() {
 
     const handleJoin = async () => {
         try {
-            await axios.post("http://localhost:8000/api/v1/groups/join", { invite_code: inviteCode });
+            await axios.post(`${API_URL}/api/v1/groups/join`, { invite_code: inviteCode });
             window.location.href = "/dashboard"; // Redirect to dashboard
         } catch (err: any) {
             setError(err.response?.data?.detail || "Invalid invite code");

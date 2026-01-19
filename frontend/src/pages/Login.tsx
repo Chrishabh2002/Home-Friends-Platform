@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import API_URL from '../config';
 import axios from 'axios';
 import { useAuthStore } from '../store/authStore';
 import { useNavigate } from 'react-router-dom';
@@ -16,7 +17,7 @@ export default function Login() {
         setError('');
         try {
             if (isLogin) {
-                const res = await axios.post('http://localhost:8000/api/v1/auth/login', {
+                const res = await axios.post(`${API_URL}/api/v1/auth/login`, {
                     email: data.email,
                     password: data.password
                 });
@@ -24,10 +25,10 @@ export default function Login() {
                 navigate('/dashboard'); // Direct to dashboard
             } else {
                 // Signup
-                await axios.post('http://localhost:8000/api/v1/auth/signup', data);
+                await axios.post(`${API_URL}/api/v1/auth/signup`, data);
 
                 // Auto-login after signup
-                const loginRes = await axios.post('http://localhost:8000/api/v1/auth/login', {
+                const loginRes = await axios.post(`${API_URL}/api/v1/auth/login`, {
                     email: data.email,
                     password: data.password
                 });

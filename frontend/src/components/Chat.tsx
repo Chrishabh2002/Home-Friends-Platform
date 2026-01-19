@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
+import API_URL from '../config';
 import { useAuthStore } from '../store/authStore';
 import { Send, X, Minimize2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -31,7 +32,7 @@ export default function Chat({ groupId, onClose }: ChatProps) {
     useEffect(() => {
         const loadHistory = async () => {
             try {
-                const res = await axios.get(`http://localhost:8000/api/v1/chat/${groupId}/history`, {
+                const res = await axios.get(`${API_URL}/api/v1/chat/${groupId}/history`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 if (res.data && Array.isArray(res.data)) {
@@ -55,7 +56,7 @@ export default function Chat({ groupId, onClose }: ChatProps) {
 
         const connect = () => {
             console.log("🔌 Connecting to Live Chat...");
-            socket = new WebSocket(`ws://localhost:8000/api/v1/chat/${groupId}?token=${token}`);
+            socket = new WebSocket(`${API_URL.replace(/^http/, 'ws')}/api/v1/chat/${groupId}?token=${token}`);
 
             socket.onopen = () => {
                 console.log("✅ Connected to Live Chat");
