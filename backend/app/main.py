@@ -21,7 +21,12 @@ origins = [
     "http://localhost:3000",
     "https://home-friends-platform.vercel.app",
     "https://home-friends-platform.onrender.com",
+    "https://home-friends-platform.vercel.app/",
+    "https://home-friends-platform.onrender.com/",
 ]
+
+print("Allowed Origins:", origins)
+
 
 app.add_middleware(
     CORSMiddleware,
